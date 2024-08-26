@@ -12,95 +12,106 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-
-  final _mybox = Hive.box('myBox');
+  final _mybox = Hive.box('myBox2');
 
   final _controller = TextEditingController();
+  var selectDate = DateTime.now();
+  var selectTime = DateTime.now();
 
   ToDoDatabase db = ToDoDatabase();
 
-
   @override
-  void initState(){
-    if(_mybox.get('TODOLIST')==null){
+  void initState() {
+    if (_mybox.get('TODOLIST') == null) {
       db.CreateInitialData();
-    }
-    else{
+    } else {
       db.LoadData();
     }
     super.initState();
   }
 
-  void checkBoxChanged(int a){
+  void checkBoxChanged(int a) {
     setState(() {
       db.toDoList[a][1] = !db.toDoList[a][1];
     });
-    db.UpdataData();
-  } 
+    db.UpdateData();
+  }
 
-  void save(){
+  void save() {
     setState(() {
-      db.toDoList.add([_controller.text,false]);
+      db.toDoList.add([_controller.text, false, selectDate]);
       _controller.clear();
     });
     Navigator.of(context).pop();
-    db.UpdataData();
+    db.UpdateData();
   }
 
-  void newTile(){
+  void newTile() {
     showDialog(
       context: context,
-      builder: (context){
+      builder: (context) {
         return DialogBox(
           controller: _controller,
+          selectedDate: selectDate,
+          selectedTime: selectTime,
           onSave: save,
           onCancel: () => Navigator.of(context).pop(),
         );
+      },
+    ).then((result) {
+      if (result != null) {
+        if (result.containsKey('selectedDate')) {
+          selectDate = result['selectedDate'];
+        }
+        if (result.containsKey('selectedTime')) {
+          selectTime = result['selectedTime'];
+        }
+        // Do something with the selected date and time
       }
-    );
+    });
   }
 
-  void delete(int a){
+  void delete(int a) {
     setState(() {
       db.toDoList.removeAt(a);
     });
-    db.UpdataData();
+    db.UpdateData();
   }
 
- 
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 27, 23, 23),
+      backgroundColor: Color.fromRGBO(235, 54, 120, 1),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 99, 0, 0),
-        title: Center(
-          child: Text('TO DO',
-            style: TextStyle(
+        backgroundColor: Color.fromRGBO(24, 1, 97, 1),
+        title: const Center(
+            child: Text(
+          'TO DO',
+          style: TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.bold,
-              color: Color.fromARGB(255, 238, 238,238)
-            ),
-          )
-        ),
+              color: Color.fromRGBO(235, 54, 120, 1)),
+        )),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color.fromRGBO(24, 1, 97, 1),
         onPressed: newTile,
-        child: Icon(Icons.add,
+        child: const Icon(
+          Icons.add,
           size: 30,
-          color: Color.fromARGB(255, 57, 62, 70),
+          color: Color.fromRGBO(235, 54, 120, 1),
         ),
       ),
       body: ListView.builder(
-        itemCount: db.toDoList.length,
-        itemBuilder: (context, index){
-          return TodoTile(
-            taskname: db.toDoList[index][0],
-            taskcomplete: db.toDoList[index][1],
-            onChanged: (value) => checkBoxChanged(index),
-            deleteFunction: (context) => delete(index),
-          );
-        }
-      ),
+          itemCount: db.toDoList.length,
+          itemBuilder: (context, index) {
+            return TodoTile(
+              taskname: db.toDoList[index][0],
+              taskcomplete: db.toDoList[index][1],
+              taskDateTime: db.toDoList[index][2],
+              onChanged: (value) => checkBoxChanged(index),
+              deleteFunction: (context) => delete(index),
+            );
+          }),
     );
   }
 }
