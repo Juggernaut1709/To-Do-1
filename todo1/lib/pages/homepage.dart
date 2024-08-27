@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo1/data/database.dart';
+import 'package:todo1/data/notif.dart';
 import 'package:todo1/utilities/dialog_box.dart';
 import 'package:todo1/utilities/todo_tile.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -38,12 +39,24 @@ class _HomepageState extends State<Homepage> {
   }
 
   void save() {
+    DateTime taskDateTime = selectDate;
+    scheduleNotification(taskDateTime, _controller.text);
     setState(() {
       db.toDoList.add([_controller.text, false, selectDate]);
       _controller.clear();
     });
-    Navigator.of(context).pop();
+
     db.UpdateData();
+    Navigator.of(context).pop();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // App is in background
+    } else if (state == AppLifecycleState.resumed) {
+      // App is in foreground
+    }
   }
 
   void newTile() {
