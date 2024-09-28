@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:todo1/utilities/buttons.dart';
-import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
-    as dtp;
+import 'package:calendar_view/calendar_view.dart';
 
-class DialogBox extends StatelessWidget {
+class DialogBox extends StatefulWidget {
   final TextEditingController controller;
   final DateTime? selectedDate;
   final DateTime? selectedTime;
@@ -20,100 +19,111 @@ class DialogBox extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _DialogBoxState createState() => _DialogBoxState();
+}
+
+class _DialogBoxState extends State<DialogBox> {
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.selectedDate;
+    _selectedTime = widget.selectedTime != null
+        ? TimeOfDay(
+            hour: widget.selectedTime!.hour,
+            minute: widget.selectedTime!.minute)
+        : null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color.fromRGBO(229, 229, 203, 1),
-      content: Container(
+      backgroundColor: const Color.fromRGBO(214, 239, 216, 1),
+      content: SizedBox(
         height: 200,
+        width: 600,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextField(
-              controller: controller,
+              controller: widget.controller,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
                 hintText: 'Enter your task',
               ),
             ),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {
-                    dtp.DatePicker.showDatePicker(
-                      context,
-                      showTitleActions: true,
-                      minTime: DateTime.now(),
-                      maxTime: DateTime(2100, 12, 31),
-                      theme: const dtp.DatePickerTheme(
-                        headerColor: Color.fromRGBO(26, 18, 11, 1),
-                        backgroundColor: Color.fromRGBO(229, 229, 203, 1),
-                        itemStyle: TextStyle(
-                          color: Color.fromARGB(255, 60, 42, 33),
-                          fontWeight: FontWeight.bold,
-                        ),
-                        doneStyle: TextStyle(
-                          color: Color.fromRGBO(213, 206, 163, 1),
-                          fontSize: 16,
-                        ),
-                      ),
-                      onConfirm: (date) {
-                        Navigator.pop(context, {'selectedDate': date});
-                      },
-                      currentTime: selectedDate ?? DateTime.now(),
-                      locale: dtp.LocaleType.en,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: const Color.fromRGBO(128, 175, 129, 1),
+                    backgroundColor: const Color.fromRGBO(26, 83, 25, 1),
+                  ),
+                  onPressed: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDate ?? DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2100, 12, 31),
                     );
+                    if (pickedDate != null) {
+                      setState(() {
+                        _selectedDate = pickedDate;
+                      });
+                    }
                   },
+                  // ignore: prefer_const_constructors
                   icon: Icon(Icons.date_range),
                   label: Text(
-                    selectedDate != null
-                        ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                    _selectedDate != null
+                        ? "${_selectedDate!.day}/${_selectedDate!.month}"
                         : "Pick Date",
                   ),
                 ),
+                const SizedBox(width: 5),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    dtp.DatePicker.showTimePicker(
-                      context,
-                      showTitleActions: true,
-                      theme: const dtp.DatePickerTheme(
-                        headerColor: Color.fromRGBO(26, 18, 11, 1),
-                        backgroundColor: Color.fromRGBO(229, 229, 203, 1),
-                        itemStyle: TextStyle(
-                          color: Color.fromARGB(255, 60, 42, 33),
-                          fontWeight: FontWeight.bold,
-                        ),
-                        doneStyle: TextStyle(
-                          color: Color.fromRGBO(213, 206, 163, 1),
-                          fontSize: 16,
-                        ),
-                      ),
-                      onConfirm: (time) {
-                        Navigator.pop(context, {'selectedTime': time});
-                      },
-                      currentTime: selectedTime ?? DateTime.now(),
-                      locale: dtp.LocaleType.en,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: const Color.fromRGBO(128, 175, 129, 1),
+                    backgroundColor: const Color.fromRGBO(26, 83, 25, 1),
+                  ),
+                  onPressed: () async {
+                    TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: _selectedTime ?? TimeOfDay.now(),
                     );
+                    if (pickedTime != null) {
+                      setState(() {
+                        _selectedTime = pickedTime;
+                      });
+                    }
                   },
-                  icon: Icon(Icons.access_time),
+                  icon: const Icon(Icons.access_time),
                   label: Text(
-                    selectedTime != null
-                        ? "${selectedTime!.hour}:${selectedTime!.minute}"
+                    _selectedTime != null
+                        ? "${_selectedTime!.hour}:${_selectedTime!.minute}"
                         : "Pick Time",
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Buttons(
                   text: 'SAVE',
-                  onPressed: onSave,
+                  onPressed: widget.onSave,
                 ),
                 Buttons(
                   text: 'CANCEL',
-                  onPressed: onCancel,
+                  onPressed: widget.onCancel,
                 ),
               ],
             ),

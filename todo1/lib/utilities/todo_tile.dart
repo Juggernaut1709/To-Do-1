@@ -30,14 +30,14 @@ class TodoTile extends StatelessWidget {
               onPressed: deleteFunction,
               icon: Icons.delete,
               backgroundColor: Color.fromARGB(255, 120, 22, 15),
-              foregroundColor: Color.fromRGBO(251, 119, 60, 1),
+              foregroundColor: Color.fromRGBO(213, 235, 216, 1),
             ),
           ],
         ),
         child: Container(
           padding: EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(79, 23, 135, 1),
+            color: Color.fromRGBO(128, 175, 129, 1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -48,12 +48,12 @@ class TodoTile extends StatelessWidget {
                   Checkbox(
                     value: taskcomplete,
                     onChanged: onChanged,
-                    activeColor: Color.fromRGBO(251, 119, 60, 1),
+                    activeColor: Color.fromRGBO(26, 83, 25, 1),
                   ),
                   Text(
                     taskname,
                     style: TextStyle(
-                      color: Color.fromRGBO(251, 119, 60, 1),
+                      color: Color.fromRGBO(26, 83, 25, 1),
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       decoration: taskcomplete
@@ -65,9 +65,9 @@ class TodoTile extends StatelessWidget {
               ),
               Text(
                 "${taskDateTime.day}/${taskDateTime.month}/${taskDateTime.year} ${taskDateTime.hour}:${taskDateTime.minute}",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
-                  color: Color.fromRGBO(251, 119, 60, 1),
+                  color: Color.fromRGBO(26, 83, 25, 1),
                 ),
               ),
             ],
